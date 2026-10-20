@@ -1,6 +1,6 @@
 cask "link-all" do
-  version "2.0.1"
-  sha256 "141bd9feed877607fc4911dd937ee3ced84605440d440d97414ad45f9eaa58e5"
+  version "2.0.2"
+  sha256 "f7aa63351e99aea013b972603a26b2b0753da0ee6ce8f0bc87437216c68db074"
 
   url "https://github.com/ChinmayyK/Link-All/releases/download/v#{version}/LinkAll.dmg"
   name "Link All"
