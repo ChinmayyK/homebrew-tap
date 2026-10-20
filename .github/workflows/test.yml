@@ -1,0 +1,44 @@
+name: Test cask
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  install:
+    name: Install Link All
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Tap this checkout
+        run: |
+          brew update
+          brew tap --custom-remote chinmayyk/tap "$GITHUB_WORKSPACE"
+
+      - name: Style and audit
+        run: |
+          brew style --cask chinmayyk/tap/link-all
+          brew audit --cask --online chinmayyk/tap/link-all
+
+      - name: Install
+        run: brew install --cask chinmayyk/tap/link-all
+
+      - name: Check the installed app
+        run: |
+          app="/Applications/Link All.app"
+          test -d "$app" || { echo "::error::$app is missing"; exit 1; }
+          if xattr -p com.apple.quarantine "$app" 2>/dev/null; then
+            echo "::error::the quarantine flag is still set"; exit 1
+          fi
+          version=$(defaults read "$app/Contents/Info.plist" CFBundleShortVersionString)
+          cask=$(brew info --cask --json=v2 chinmayyk/tap/link-all | ruby -rjson -e 'puts JSON.parse(STDIN.read)["casks"][0]["version"]')
+          echo "app $version, cask $cask"
+          [ "$version" = "$cask" ] || { echo "::error::the app is $version but the cask says $cask"; exit 1; }
+
+      - name: Uninstall
+        run: |
+          brew uninstall --cask chinmayyk/tap/link-all
+          test ! -d "/Applications/Link All.app"
