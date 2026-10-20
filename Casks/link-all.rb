@@ -17,6 +17,13 @@ cask "link-all" do
 
   app "Link All.app"
 
+  # Link All isn't notarized yet, so clear the quarantine flag to skip the Gatekeeper prompt.
+  postflight_steps do
+    run "/usr/bin/xattr",
+        args:         ["-dr", "com.apple.quarantine", "/Applications/Link All.app"],
+        must_succeed: false
+  end
+
   zap trash: [
     "~/Library/Application Support/linkall",
     "~/Library/Preferences/app.linkall.mac.plist",
